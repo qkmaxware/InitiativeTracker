@@ -1,0 +1,139 @@
+﻿@page "/"
+
+<h1>Initiative Tracker</h1>
+
+<details class="w3-margin">
+    <summary>How To Use</summary>
+    <p>
+        <ol>
+            <li>Press the '+' button to add players and NPC to the encounter.</li>
+            <li>Fill in the Name, Hit Points, Team, and Initiative of the participant.</li>
+            <li>Press the 'Sort' button to order the participants by their initiative.</li>
+            <li>Use the 'Next' button to switch to the next participant in the order.</li>
+        </ol>
+    </p>
+</details>
+
+<table class="w3-table w3-centered">
+    <thead>
+        <th style="width: 10em">Initiative</th>
+        <th>Name</th>
+        <th style="width: 10em">Type</th>
+        <th style="width: 8em">Team</th>
+        <th style="width: 6em">HP</th>
+    </thead>
+    <tbody>
+        @foreach (var character in participants) {
+            <tr name="@character.Name" class="@(character.IsTurn?"active":string.Empty)">
+                <td class="w3-row" style="align-items:center; justify-content:center; display: flex;">
+                    <button class="w3-button w3-col" style="width: 2em; height: 2em; padding:0; margin:0;flex-shrink:0;flex-grow:0;" @onclick=@(() => roll(character))>
+                        <img src="D20_icon.png" style="width: 100%; height: 100%;">
+                    </button>
+                    <div class="w3-rest">
+                        <input class="w3-input" type="number" @bind=@character.Initative>
+                    </div>
+                </td>
+                <td>
+                    <input class="w3-input" type="text" @bind=@character.Name>
+                </td>
+                <td>
+                    <select class="w3-input" @bind=@character.Kind>
+                        @foreach (CharacterKind kind in Enum.GetValues<CharacterKind>()) {
+                            <option>@kind</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <select class="w3-input" @bind=@character.Team style="color: @(character.Team);">
+                        @foreach (var team in teams) {
+                            <option style="color: @(team);">@team</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <input class="w3-input" type="number" @bind=@character.Hp>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<footer style="padding: 6px 38px;">
+    <b>Round:</b> <span>@this.round</span>
+</footer>
+<div class="w3-row w3-padding">
+    <div class="w3-col s6">
+        <button class="w3-button w3-border w3-border-blue" @onclick=sort>Sort</button>
+        <button class="w3-button w3-border w3-border-red" @onclick=reset>Reset</button>
+        <button class="w3-button w3-border w3-border-green" @onclick=next>Next</button>
+    </div>
+    <div class="w3-col s6 w3-right-align">
+        <div class="w3-dropdown-hover">
+            <button class="w3-button w3-border w3-border-red" style="color: white;">Clear &downarrow;</button>
+            <div class="w3-dropdown-content w3-bar-block w3-border w3-border-red">
+                <a href="#" class="w3-bar-item w3-button" @onclick=clear>All</a>
+                <a href="#" class="w3-bar-item w3-button" @onclick=@(() => clear(CharacterKind.Player))>Players</a>
+                <a href="#" class="w3-bar-item w3-button" @onclick=@(() => clear(CharacterKind.NPC))>NPCs</a>
+            </div>
+        </div>
+        <button class="w3-button w3-border w3-border-yellow" @onclick=add>+</button>
+    </div>
+</div>
+
+@code {
+    private List<Character> participants = new List<Character>();
+    private string[] teams = new string[]{"red", "green", "blue", "yellow", "magenta"};
+
+    private void sort() {
+        participants = participants.OrderByDescending(c => c.Initative).ToList();
+    }
+
+    private Random rng = new Random();
+    private void roll(Character c) {
+        c.Initative = rng.Next(20) + 1;
+    }
+
+    private int round = 0;
+    private void next() {
+        if (participants.Count < 1)
+            return;
+
+        var active = participants.Where(c => c.IsTurn).FirstOrDefault();
+        if (active == null) {
+            active = participants.First();
+        }
+
+        var index = participants.IndexOf(active);
+        var next_index = index + 1;
+
+        active.IsTurn = false;
+        if (next_index >= participants.Count) {
+            round++;
+            next_index = 0;
+        }
+
+        var next_active = participants[next_index];
+        next_active.IsTurn = true;
+    }
+
+    private void reset() {
+        round = 0;
+        foreach (var c in this.participants)
+            c.IsTurn = false;
+        if (this.participants.Count > 0)
+            this.participants[0].IsTurn = true;
+    }
+
+    private void clear() {
+        participants.Clear();
+    }
+    private void clear(CharacterKind kind) {
+        participants.RemoveAll(c => c.Kind == kind);
+    }
+
+    private void add() {
+        this.participants.Add(new Character());
+        if (this.participants.Count == 1)
+            this.participants[0].IsTurn = true;
+    }
+}
