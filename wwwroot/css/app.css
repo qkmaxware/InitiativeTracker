@@ -35,7 +35,7 @@ table tbody tr:nth-child(even) {
 }
 
 .active {
-    background-color: #931621;
+    background-color: #931621 !important;
 }
 
 .w3-dropdown-hover:first-child {
