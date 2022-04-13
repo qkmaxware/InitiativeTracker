@@ -2,17 +2,59 @@
 
 <h1>Initiative Tracker</h1>
 
-<details class="w3-margin">
-    <summary>How To Use</summary>
-    <p>
-        <ol>
-            <li>Press the '+' button to add players and NPC to the encounter.</li>
-            <li>Fill in the Name, Hit Points, Team, and Initiative of the participant.</li>
-            <li>Press the 'Sort' button to order the participants by their initiative.</li>
-            <li>Use the 'Next' button to switch to the next participant in the order.</li>
-        </ol>
-    </p>
-</details>
+<div class="w3-margin">
+    <details>
+        <summary>How To Use</summary>
+        <p class="w3-container">
+            <ol>
+                <li>Press the '+' button to add players and NPC to the encounter.</li>
+                <li>Fill in the Name, Hit Points, Team, and Initiative of the participant.</li>
+                <li>Press the 'Sort' button to order the participants by their initiative.</li>
+                <li>Use the 'Next' button to switch to the next participant in the order.</li>
+            </ol>
+        </p>
+    </details>
+    <details>
+        <summary>Options</summary>
+        <p class="w3-container">
+            <input type="checkbox" @bind="optionPinCurrentActor"> 
+            Pin the character whose turn it is to the <select @bind="optionPinningVertical">
+                <option value="@Top">top</option>
+                <option value="@Bottom">bottom</option>
+            </select> <select @bind="optionPinningHorizontal">
+                <option value="@Left">left</option>
+                <option value="@Middle">middle</option>
+                <option value="@Right">right</option>
+            </select> of the page <select @bind="optionPinningBackground">
+                <option value="@Transparent">with a transparent backdrop</option>
+                <option value="@Solid">wth a solid backdrop</option>
+            </select>.
+        </p>
+        <p class="w3-container">
+            <input type="checkbox" @bind="optionSkipDeadNPC"> 
+            Automatically skip the turns of NPCs who are at 0 HP.
+        </p>
+    </details>
+</div>
+
+<div class="w3-center w3-padding">
+    <div class="w3-dropdown-hover">
+        <button class="w3-button w3-border w3-border-red" style="color: white;">Clear &downarrow;</button>
+        <div class="w3-dropdown-content w3-bar-block w3-border w3-border-red">
+            <a href="#" class="w3-bar-item w3-button" @onclick=clear>All</a>
+            <a href="#" class="w3-bar-item w3-button" @onclick=@(() => clear(CharacterKind.Player))>Players</a>
+            <a href="#" class="w3-bar-item w3-button" @onclick=@(() => clear(CharacterKind.NPC))>NPCs</a>
+        </div>
+    </div>
+    <div class="w3-dropdown-hover">
+        <button class="w3-button w3-border w3-border-yellow" style="color: white;">+</button>
+        <div class="w3-dropdown-content w3-bar-block w3-border w3-border-red">
+            <a href="#" class="w3-bar-item w3-button" @onclick=addGeneric>Generic</a>
+            <a href="#" class="w3-bar-item w3-button" @onclick=addPlayer>Player</a>
+            <a href="#" class="w3-bar-item w3-button" @onclick=addNPC>NPC</a>
+        </div>
+    </div>
+</div>
 
 <table class="w3-table w3-centered">
     <thead>
@@ -58,7 +100,7 @@
     </tbody>
 </table>
 
-<footer style="padding: 6px 38px;">
+<footer style="padding: 6px 40px;">
     <b>Round:</b> <span>@this.round</span>
 </footer>
 <div class="w3-row w3-padding">
@@ -67,22 +109,108 @@
         <button class="w3-button w3-border w3-border-red" @onclick=reset>Reset</button>
         <button class="w3-button w3-border w3-border-green" @onclick=next>Next</button>
     </div>
-    <div class="w3-col s6 w3-right-align">
-        <div class="w3-dropdown-hover">
-            <button class="w3-button w3-border w3-border-red" style="color: white;">Clear &downarrow;</button>
-            <div class="w3-dropdown-content w3-bar-block w3-border w3-border-red">
-                <a href="#" class="w3-bar-item w3-button" @onclick=clear>All</a>
-                <a href="#" class="w3-bar-item w3-button" @onclick=@(() => clear(CharacterKind.Player))>Players</a>
-                <a href="#" class="w3-bar-item w3-button" @onclick=@(() => clear(CharacterKind.NPC))>NPCs</a>
-            </div>
-        </div>
-        <button class="w3-button w3-border w3-border-yellow" @onclick=add>+</button>
-    </div>
+    <div class="w3-col s6">&nbsp;</div>
 </div>
+
+@if (optionPinCurrentActor) {
+    <div class="w3-padding @optionPinningBackground" style="position: fixed; left: 0; @(optionPinningVertical): 0; width: 100%;">
+        @{
+            var actor = this.ActiveCharacter;
+            var next = this.NextCharacter;
+            if (actor != null) {
+                <div class="w3-round-xlarge panel" style="width: 480px; max-width: 100%; @optionPinningHorizontal padding: 4px;">
+                    <div class="w3-round-xlarge w3-bar w3-padding w3-row accent">
+                        @if (next != null) {
+                        <div class="w3-col w3-right" style="width: 120px; overflow: hidden;">
+                            <div class="w3-bar-item w3-center">
+                                <button class="w3-large w3-button w3-round-large" style="padding:4px" @onclick=this.next>Next:</button><br>
+                                <span class="w3-text-@next.Team">@next.Name</span>
+                            </div>
+                        </div>
+                        }
+                        <div class="w3-rest">
+                            <div class="w3-bar-item">
+                                <span class="w3-large">@actor.Name</span><br>
+                                <div class="w3-display-container w3-small" style="display: inline-block; width: 2.5em">
+                                    <img src="D20_icon.png" class="w3-circle" style="width: 100%">
+                                    <span class="w3-display-middle w3-text-white">@actor.Initative</span>
+                                </div>
+                                <div class="w3-display-container w3-small" style="display: inline-block; width: 2.5em">
+                                    <img src="icons/heart.svg" class="w3-circle" style="width: 100%">
+                                    <span class="w3-display-middle w3-text-white">@actor.Hp</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
 
 @code {
     private List<Character> participants = new List<Character>();
-    private string[] teams = new string[]{"red", "green", "blue", "yellow", "magenta"};
+    private string[] teams = new string[]{"blue", "green", "red", "yellow", "magenta"};
+
+    private bool optionPinCurrentActor;
+
+    private static readonly string Transparent = "transparent";
+    private static readonly string Solid = "panel";
+    private string optionPinningBackground = Transparent;
+
+    private static readonly string Top = "top";
+    private static readonly string Bottom = "bottom";
+    private string optionPinningVertical = Bottom;
+
+    private static readonly string Middle = "margin-left: auto; margin-right: auto;";
+    private static readonly string Left = "margin-left: 0; margin-right: auto;";
+    private static readonly string Right = "margin-left: auto; margin-right: 0;";
+    private string optionPinningHorizontal = Middle;
+
+    private bool optionSkipDeadNPC = false;
+
+    private Character ActiveCharacter => participants.Where(c => c.IsTurn).FirstOrDefault();
+    private Character NextCharacter {
+        get {
+            var active = ActiveCharacter;
+            if (active == null)
+                return null;
+
+            var index = participants.IndexOf(ActiveCharacter);
+            Character next = null;
+
+            // Scan forward
+            for (var next_index = index + 1; next_index < participants.Count; next_index++) {
+                next = participants[next_index];
+                if (optionSkipDeadNPC && next.Kind == CharacterKind.NPC && next.Hp <= 0) {
+                    // Skip this NPC
+                    next = null;
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            if (next != null)
+                return next;
+
+            // Scan next round from begining
+            for (var next_index = 0; next_index < index; next_index++) {
+                next = participants[next_index];
+                if (optionSkipDeadNPC && next.Kind == CharacterKind.NPC && next.Hp <= 0) {
+                    // Skip this NPC
+                    next = null;
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            if (next != null)
+                return next;
+
+            // Done a full loop and no one else can act, stay on the active character
+            return active;
+        }
+    }
 
     private void sort() {
         participants = participants.OrderByDescending(c => c.Initative).ToList();
@@ -98,22 +226,26 @@
         if (participants.Count < 1)
             return;
 
-        var active = participants.Where(c => c.IsTurn).FirstOrDefault();
+        // Fetch the active character (or make the first character the active character)
+        var active = ActiveCharacter;
         if (active == null) {
             active = participants.First();
+            active.IsTurn = true;
         }
-
         var index = participants.IndexOf(active);
-        var next_index = index + 1;
 
+        // Fetch the next character
+        var next = this.NextCharacter;
+        var next_index = participants.IndexOf(next);
+        
+        // Swap turns
         active.IsTurn = false;
-        if (next_index >= participants.Count) {
+        next.IsTurn = true;
+        
+        // Test for wrap-arounds
+        if (next_index <= index) {
             round++;
-            next_index = 0;
         }
-
-        var next_active = participants[next_index];
-        next_active.IsTurn = true;
     }
 
     private void reset() {
@@ -131,9 +263,30 @@
         participants.RemoveAll(c => c.Kind == kind);
     }
 
-    private void add() {
-        this.participants.Add(new Character());
+    private void add(Character c) {
+        this.participants.Add(c);
         if (this.participants.Count == 1)
             this.participants[0].IsTurn = true;
+    }
+    private void addGeneric() {
+        add(new Character {
+            Kind = CharacterKind.NPC,
+            Team = teams[0],
+            Initative = 1,
+        });
+    }
+    private void addPlayer() {
+        add(new Character {
+            Kind = CharacterKind.Player,
+            Team = teams[1],
+            Initative = 1,
+        });
+    }
+    private void addNPC() {
+        add(new Character {
+            Kind = CharacterKind.NPC,
+            Team = teams[2],
+            Initative = 1,
+        });
     }
 }
