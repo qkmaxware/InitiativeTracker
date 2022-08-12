@@ -946,6 +946,261 @@ public static partial class MonsterCatalogue {
                 new Attribute { Name = "CHA", Value = 5 },
             }
         });
+        All.Add(new Character() {
+            Name = "Cat",
+            Ac = 12,
+            Hp = 2,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 3 },
+                new Attribute { Name = "DEX", Value = 15 },
+                new Attribute { Name = "CON", Value = 10 },
+                new Attribute { Name = "INT", Value = 3 },
+                new Attribute { Name = "WIS", Value = 12 },
+                new Attribute { Name = "CHA", Value = 7 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Centaur",
+            Ac = 12,
+            Hp = 45,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 18 },
+                new Attribute { Name = "DEX", Value = 14 },
+                new Attribute { Name = "CON", Value = 14 },
+                new Attribute { Name = "INT", Value = 9 },
+                new Attribute { Name = "WIS", Value = 13 },
+                new Attribute { Name = "CHA", Value = 11 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Chain Devil",
+            Ac = 16,
+            Hp = 85,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 18 },
+                new Attribute { Name = "DEX", Value = 15 },
+                new Attribute { Name = "CON", Value = 18 },
+                new Attribute { Name = "INT", Value = 11 },
+                new Attribute { Name = "WIS", Value = 12 },
+                new Attribute { Name = "CHA", Value = 14 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Chimera",
+            Ac = 14,
+            Hp = 114,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 19 },
+                new Attribute { Name = "DEX", Value = 11 },
+                new Attribute { Name = "CON", Value = 19 },
+                new Attribute { Name = "INT", Value = 3 },
+                new Attribute { Name = "WIS", Value = 14 },
+                new Attribute { Name = "CHA", Value = 10 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Chuul",
+            Ac = 16,
+            Hp = 93,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 19 },
+                new Attribute { Name = "DEX", Value = 10 },
+                new Attribute { Name = "CON", Value = 16 },
+                new Attribute { Name = "INT", Value = 5 },
+                new Attribute { Name = "WIS", Value = 11 },
+                new Attribute { Name = "CHA", Value = 5 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Clay Golem",
+            Ac = 14,
+            Hp = 133,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 20 },
+                new Attribute { Name = "DEX", Value = 9 },
+                new Attribute { Name = "CON", Value = 18 },
+                new Attribute { Name = "INT", Value = 3 },
+                new Attribute { Name = "WIS", Value = 8 },
+                new Attribute { Name = "CHA", Value = 1 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Cloaker",
+            Ac = 14,
+            Hp = 78,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 17 },
+                new Attribute { Name = "DEX", Value = 15 },
+                new Attribute { Name = "CON", Value = 12 },
+                new Attribute { Name = "INT", Value = 13 },
+                new Attribute { Name = "WIS", Value = 12 },
+                new Attribute { Name = "CHA", Value = 14 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Cloud Giant",
+            Ac = 14,
+            Hp = 200,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 27 },
+                new Attribute { Name = "DEX", Value = 10 },
+                new Attribute { Name = "CON", Value = 22 },
+                new Attribute { Name = "INT", Value = 12 },
+                new Attribute { Name = "WIS", Value = 16 },
+                new Attribute { Name = "CHA", Value = 16 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Cockatrice",
+            Ac = 11,
+            Hp = 27,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 6 },
+                new Attribute { Name = "DEX", Value = 12 },
+                new Attribute { Name = "CON", Value = 12 },
+                new Attribute { Name = "INT", Value = 2 },
+                new Attribute { Name = "WIS", Value = 12 },
+                new Attribute { Name = "CHA", Value = 5 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Constrictor Snake",
+            Ac = 12,
+            Hp = 13,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 15 },
+                new Attribute { Name = "DEX", Value = 14 },
+                new Attribute { Name = "CON", Value = 12 },
+                new Attribute { Name = "INT", Value = 1 },
+                new Attribute { Name = "WIS", Value = 10 },
+                new Attribute { Name = "CHA", Value = 3 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Copper Dragon Wyrmling",
+            Ac = 16,
+            Hp = 22,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 15 },
+                new Attribute { Name = "DEX", Value = 12 },
+                new Attribute { Name = "CON", Value = 13 },
+                new Attribute { Name = "INT", Value = 14 },
+                new Attribute { Name = "WIS", Value = 11 },
+                new Attribute { Name = "CHA", Value = 13 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Couatl",
+            Ac = 19,
+            Hp = 97,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 16 },
+                new Attribute { Name = "DEX", Value = 20 },
+                new Attribute { Name = "CON", Value = 17 },
+                new Attribute { Name = "INT", Value = 18 },
+                new Attribute { Name = "WIS", Value = 20 },
+                new Attribute { Name = "CHA", Value = 18 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Crab",
+            Ac = 11,
+            Hp = 2,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 2 },
+                new Attribute { Name = "DEX", Value = 11 },
+                new Attribute { Name = "CON", Value = 10 },
+                new Attribute { Name = "INT", Value = 1 },
+                new Attribute { Name = "WIS", Value = 8 },
+                new Attribute { Name = "CHA", Value = 2 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Crocodile",
+            Ac = 12,
+            Hp = 19,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 15 },
+                new Attribute { Name = "DEX", Value = 10 },
+                new Attribute { Name = "CON", Value = 13 },
+                new Attribute { Name = "INT", Value = 2 },
+                new Attribute { Name = "WIS", Value = 10 },
+                new Attribute { Name = "CHA", Value = 5 },
+            }
+        });
+        All.Add(new Character() {
+            Name = "Cyclops",
+            Ac = 14,
+            Hp = 138,
+            Links = new ExternalLinks {
+                DataSheetUrl = "https://www.dndbeyond.com/sources/basic-rules/monster-stat-blocks-c",
+                // IconUrl = ""
+            },
+            Attributes = new List<Attribute>{
+                new Attribute { Name = "STR", Value = 2 },
+                new Attribute { Name = "DEX", Value = 11 },
+                new Attribute { Name = "CON", Value = 20 },
+                new Attribute { Name = "INT", Value = 8 },
+                new Attribute { Name = "WIS", Value = 6 },
+                new Attribute { Name = "CHA", Value = 10 },
+            }
+        });
         #endregion 
     }
 
