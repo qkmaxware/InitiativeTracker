@@ -1,0 +1,25 @@
+<div class="w3-modal @css">
+    <div class="w3-modal-content w3-round-xlarge w3-padding">
+        <h2>@Title</h2>
+        @if (visible) {
+            @ChildContent
+        }
+        <div class="w3-padding w3-center">
+            <button class="w3-button w3-round-large panel" @onclick=hide>Close</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title {get; set;}
+    [Parameter] public RenderFragment ChildContent {get; set;}
+    private bool visible;
+    private string css => visible ? "w3-show" : "w3-hide";
+    public void Show(bool isVisible) {
+        visible = isVisible;
+        StateHasChanged();
+    }
+    private void hide() {
+        Show(false);
+    }
+}

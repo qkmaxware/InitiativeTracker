@@ -1,0 +1,133 @@
+@if (show) {
+<div class="@verticalAnchor" style="pointer-events: none; position: fixed; left: 0; width: 100%;">
+    @{
+        var actor = this.ActiveCharacter;
+        var next = this.NextCharacter;
+        if (actor != null) {
+            <div class="w3-padding @Background @horizontalAnchor" style="pointer-events: auto; width: 480px; max-width: 100%; padding: 4px;">
+                <div class="w3-padding actor">
+                    <div class="w3-row">
+                        @if (!string.IsNullOrEmpty(actor.Links.IconUrl)) {
+                        <div class="w3-col w3-display-container" style="width: @(imageSize + imageBuffer)px; height: @(imageSize)px;">
+                            <img src="@actor.Links.IconUrl" style="width: @(imageSize)px; height: @(imageSize)px; object-fit: contain;">
+                            <div class="w3-display-topleft w3-display-container" style="display: inline-block; width: 2.5em">
+                                <img src="icons/heart.svg" class="w3-circle" style="width: 100%">
+                                <span class="w3-display-middle w3-text-white">@actor.Hp</span>
+                            </div>
+                            @if (actor.Ac > 0) {
+                            <div class="w3-display-bottomright w3-display-container" style="display: inline-block; width: 2.5em">
+                                <img src="icons/shield.svg" class="w3-circle" style="width: 100%">
+                                <span class="w3-display-middle w3-text-white">@actor.Ac</span>
+                            </div>
+                            }
+                        </div>
+                        } else {
+                            <div class="w3-col" style="width: calc(2.5em + @(imageBuffer)px); height: @(imageSize)px;">
+                                <div class="w3-display-container" style="display: inline-block; width: 2.5em">
+                                    <img src="icons/heart.svg" class="w3-circle" style="width: 100%">
+                                    <span class="w3-display-middle w3-text-white">@actor.Hp</span>
+                                </div>
+                                @if (actor.Ac > 0) {
+                                <div class="w3-display-container" style="display: inline-block; width: 2.5em">
+                                    <img src="icons/shield.svg" class="w3-circle" style="width: 100%">
+                                    <span class="w3-display-middle w3-text-white">@actor.Ac</span>
+                                </div>
+                                }
+                            </div>
+                        }
+                        <div class="w3-rest">
+                            <span class="w3-large">@actor.Name</span><br>
+                            <div>
+                                @if (actor.Attributes != null) {
+                                    foreach (var att in actor.Attributes) {
+                                        if (att.Value != 0) {
+                                            <div class="w3-small w3-center attr" style="display: inline-block;">
+                                                <div class="head">@att.Name</div>
+                                                <div>@att.Value</div>
+                                            </div>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (next != null) {
+                    <div style="text-align: right; overflow: hidden;">
+                        <b>Next:</b> <span style="color: @next.Team.ColourCode">@next.Name</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+}
+
+@code {
+    private int imageSize = 90;
+    private int imageBuffer = 6;
+    public bool show {get; set;}
+    public BackgroundClass Background {get; set;} 
+    public HorizontalAnchor horizontalAnchor {get; set;}
+    public VerticalAnchor verticalAnchor {get; set;}
+    private Character _active;
+    private Character _next;
+    [Parameter] public Character ActiveCharacter {
+        get => _active;
+        set {
+            if (value != _active) {
+                _active = value;
+                StateHasChanged();
+            }
+        }
+    }    
+    [Parameter] public Character NextCharacter {
+        get => _next;
+        set {
+            if (value != _next) {
+                _next = value;
+                StateHasChanged();
+            }
+        }
+    }
+
+    public void Show(bool show) {
+        this.show = show;
+        StateHasChanged();
+    }
+    public bool IsVisible() => show;
+
+    public enum BackgroundClass {
+        b_solid,
+        b_transparent,
+    }
+    public BackgroundClass GetClass() => Background;
+    public void SetClass(BackgroundClass @class) {
+        this.Background = @class;
+        StateHasChanged();
+    }
+
+
+
+    public enum HorizontalAnchor {
+        h_middle, h_left, h_right
+    }
+    public void SetHorizontalAnchor(HorizontalAnchor h) {
+        this.horizontalAnchor = h;
+        StateHasChanged();
+    }
+    public HorizontalAnchor GetHorizontalAnchor() => this.horizontalAnchor;
+    
+    
+    public enum VerticalAnchor {
+        v_top,
+        v_bottom
+    }
+    public void SetVerticalAnchor(VerticalAnchor v) {
+        this.verticalAnchor = v;
+        StateHasChanged();
+    }
+    public VerticalAnchor GetVerticalAnchor() => this.verticalAnchor;
+}
+

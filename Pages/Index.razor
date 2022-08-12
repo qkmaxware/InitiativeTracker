@@ -1,78 +1,197 @@
 ﻿@page "/"
 
-<h1>Initiative Tracker</h1>
+<nav>
+    <button class="w3-button" @onclick=showInstructions>Instructions</button>
+    <button class="w3-button" @onclick=showOptions>Options</button>
+</nav>
 
-<div class="w3-margin">
-    <details>
-        <summary>How To Use</summary>
-        <p class="w3-container">
-            <ol>
-                <li>Press the '+' button to add players and NPC to the encounter.</li>
-                <li>Fill in the Name, Hit Points, Team, and Initiative of the participant.</li>
-                <li>Press the 'Sort' button to order the participants by their initiative.</li>
-                <li>Use the 'Next' button to switch to the next participant in the order.</li>
-            </ol>
-        </p>
-    </details>
-    <details>
-        <summary>Options</summary>
-        <p class="w3-container">
-            <input type="checkbox" @bind="optionPinCurrentActor"> 
-            Pin the character whose turn it is to the <select @bind="optionPinningVertical">
-                <option value="@Top">top</option>
-                <option value="@Bottom">bottom</option>
-            </select> <select @bind="optionPinningHorizontal">
-                <option value="@Left">left</option>
-                <option value="@Middle">middle</option>
-                <option value="@Right">right</option>
-            </select> of the page <select @bind="optionPinningBackground">
-                <option value="@Transparent">with a transparent backdrop</option>
-                <option value="@Solid">wth a solid backdrop</option>
-            </select>.
-        </p>
-        <p class="w3-container">
-            <input type="checkbox" @bind="optionSkipDeadNPC"> 
-            Automatically skip the turns of NPCs who are at 0 HP.
-        </p>
-    </details>
-</div>
+<Modal @ref=usage Title="How To Use">
+    <p class="w3-container">
+        <ol>
+            <li>Press the '+ Player' or '+ NPC' buttons to add players and NPC to the encounter.</li>
+            <li>Fill in the Name, Hit Points, Team, and Initiative of the participant.</li>
+            <li>(optional) Press the 'Edit Attributes' button to add pictures and ability scores to your players</li>
+            <li>Press the 'Sort' button to order the participants by their initiative.</li>
+            <li>Press the 'Reset' button to reset to the round to 1, and set the first person in initiative order to be taking their turn</li>
+            <li>Use the 'Next' button to switch to the next participant in the initiative order.</li>
+        </ol>
+    </p>
+</Modal>
+@code {
+    private Modal usage;
+    private void showInstructions() {
+        usage?.Show(true);
+    }
+}
 
-<div class="w3-center w3-padding">
-    <div class="w3-dropdown-hover">
-        <button class="w3-button w3-border w3-border-red" style="color: white;">Clear &downarrow;</button>
-        <div class="w3-dropdown-content w3-bar-block w3-border w3-border-red">
-            <a href="#" class="w3-bar-item w3-button" @onclick=clear>All</a>
-            <a href="#" class="w3-bar-item w3-button" @onclick=@(() => clear(CharacterKind.Player))>Players</a>
-            <a href="#" class="w3-bar-item w3-button" @onclick=@(() => clear(CharacterKind.NPC))>NPCs</a>
+<Modal @ref=options Title="Options">
+    <p class="w3-container">
+        <input type="checkbox" @bind="optionPinCurrentActor"> 
+        Pin the character whose turn it is to the <select @bind="optionPinningVertical">
+            <option value="@PinnedActor.VerticalAnchor.v_top">top</option>
+            <option value="@PinnedActor.VerticalAnchor.v_bottom">bottom</option>
+        </select> <select @bind="optionPinningHorizontal">
+            <option value="@PinnedActor.HorizontalAnchor.h_left">left</option>
+            <option value="@PinnedActor.HorizontalAnchor.h_middle">middle</option>
+            <option value="@PinnedActor.HorizontalAnchor.h_right">right</option>
+        </select> of the page <select @bind="optionPinningBackground">
+            <option value="@PinnedActor.BackgroundClass.b_transparent">with a transparent backdrop</option>
+            <option value="@PinnedActor.BackgroundClass.b_solid">wth a solid backdrop for chroma keying</option>
+        </select>.
+    </p>
+    <p class="w3-container">
+        <input type="checkbox" @bind="optionSkipDeadNPC"> 
+        Automatically skip the turns of NPCs who are at 0 HP.
+    </p>
+</Modal>
+@code {
+    private Modal options;
+    private void showOptions() {
+        options?.Show(true);
+    }
+}
+
+<Modal @ref=editor Title="Edit Attributes">
+    @if (editedCharacter != null) {
+        <div class="w3-row">
+            <div class="w3-col" style="width: 120px;">
+                @if (!string.IsNullOrEmpty(editedCharacter.Links.IconUrl)) {
+                    <img src="@editedCharacter.Links.IconUrl" style="width: 120px; height: 120px; object-fit: contain;">
+                } 
+            </div>
+            <div class="w3-rest" style="text-align: right">
+                <div class="w3-padding">
+                    <label>Name</label>
+                    <input class="w3-input" type="text" @bind=@editedCharacter.Name>
+                    <label>Portrait Url</label>
+                    <input class="w3-input" type="text" @bind=@editedCharacter.Links.IconUrl>
+                </div>
+                <div class="w3-row-padding">
+                    <div class="w3-half">
+                        <label>Type</label>
+                        <select class="w3-input" @bind=@editedCharacter.Kind>
+                            @foreach (CharacterKind kind in Enum.GetValues<CharacterKind>()) {
+                                <option>@kind</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="w3-half">
+                        <label>Team</label>
+                        <select class="w3-input" @bind=@editedCharacter.Team style="color: @(editedCharacter.Team.ColourCode);">
+                            @foreach (var team in Team.Teams) {
+                                <option style="color: @(team.ColourCode);">@team.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="w3-padding">
+                    @if (!string.IsNullOrEmpty(editedCharacter.Links.DataSheetUrl)) {
+                        <span>See <a href="@editedCharacter.Links.DataSheetUrl" target="_blank">@(new Uri(editedCharacter.Links.DataSheetUrl).Host)</a> for more details.</span>
+                    }
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="w3-dropdown-hover">
-        <button class="w3-button w3-border w3-border-yellow" style="color: white;">+</button>
-        <div class="w3-dropdown-content w3-bar-block w3-border w3-border-red">
-            <a href="#" class="w3-bar-item w3-button" @onclick=addGeneric>Generic</a>
-            <a href="#" class="w3-bar-item w3-button" @onclick=addPlayer>Player</a>
-            <a href="#" class="w3-bar-item w3-button" @onclick=addNPC>NPC</a>
+        <div class="w3-padding">
+            <h3 class="w3-leftbar">Data</h3>
+            <div class="w3-margin-left w3-margin-right">
+                <label>Health (HP)</label>
+                <input class="w3-input" type="text" @bind=@editedCharacter.Hp>
+                <label>Armour Class (AC)</label>
+                <input class="w3-input" type="text" @bind=@editedCharacter.Ac>
+            </div>
+
+            <h3 class="w3-leftbar">Attributes</h3>
+            <ul class="w3-ul" style="margin: 0; padding: 0;">
+            @if (editedCharacter.Attributes != null) {
+                foreach (var attr in editedCharacter.Attributes) {
+                    <li class="w3-row">
+                        <div class="w3-half" style="padding-right: 8px;">
+                            <label>Name</label>
+                            <input class="w3-input" type="text" @bind=@attr.Name>
+                        </div>
+                        <div class="w3-half" style="padding-left: 8px;">
+                            <label>Value</label>
+                            <input class="w3-input" type="number" @bind=@attr.Value>
+                        </div>
+                    </li>
+                }
+            }
+            </ul>
+            <div class="w3-margin-left w3-margin-right" style="text-align: right;">
+                <button class="w3-button" style="min-width: 64px;" @onclick=@(() => remAttr(editedCharacter))>-</button>
+                <button class="w3-button" style="min-width: 64px;" @onclick=@(() => addAttr(editedCharacter))>+</button>
+            </div>
         </div>
+    }
+</Modal>
+
+<Modal @ref=catalogue Title="Monster Catalogue">
+    <p>Search for a monster from our catalogue of @MonsterCatalogue.All.Count monster(s).</p>
+    <DebounceSearch Placeholder="Search" Items=MonsterCatalogue.All Comparator=nameSearch>
+        <div class="w3-row-padding">
+            <div class="w3-half">
+                <b>@context.Name</b><br>
+                <div>
+                @if (!string.IsNullOrEmpty(context.Links.DataSheetUrl)) {
+                    <span>See <a href="@context.Links.DataSheetUrl" target="_blank">@(new Uri(context.Links.DataSheetUrl).Host)</a> for more details.</span>
+                }
+                </div>
+                <div>
+                @if (!string.IsNullOrEmpty(context.Links.IconUrl)) {
+                    <span> Monster art located on <a href="@context.Links.IconUrl" target="_blank">@(new Uri(context.Links.IconUrl).Host)</a>.</span>
+                }
+                </div>
+            </div>
+            <div class="w3-half" style="text-align: right;">
+                <button class="w3-button" @onclick=@(() => this.add(context.CloneAs(CharacterKind.NPC, Team.Teams[2])))>+ NPC</button>
+            </div>
+        </div>
+    </DebounceSearch>
+</Modal>
+
+<div class="page">
+
+<div class="w3-margin-top" style="text-align: right;">
+    <div class="w3-margin-bottom">
+        <button class="w3-button w3-border-blue" @onclick=addPlayer>
+            + Player
+        </button>
+        <button class="w3-button w3-border-blue" @onclick=this.addNPC>
+            + NPC
+        </button>
+        <button class="w3-button w3-border-blue" @onclick=this.addFromCatalogue>
+            + Catalogue
+        </button>
     </div>
 </div>
 
 <table class="w3-table w3-centered">
     <thead>
+        <th style="width: 2em"></th>
         <th style="width: 10em">Initiative</th>
         <th>Name</th>
         <th style="width: 10em">Type</th>
         <th style="width: 8em">Team</th>
         <th style="width: 6em">HP</th>
+        <th style="width: 6em"></th>
     </thead>
     <tbody>
         @foreach (var character in participants) {
             <tr name="@character.Name" class="@(character.IsTurn?"active":string.Empty)">
+                <td class="w3-row">
+                    <button class="w3-button" style="width: 2em; padding: 0px 4px;" @onclick=@(() => moveUp(character))>
+                        <img src="icons/up.svg" style="width: 100%; ">
+                    </button>
+                    <button class="w3-button" style="width: 2em; padding: 0px 4px;" @onclick=@(() => moveDown(character))>
+                        <img src="icons/down.svg" style="width: 100%;">
+                    </button>
+                </td>
                 <td class="w3-row" style="align-items:center; justify-content:center; display: flex;">
-                    <button class="w3-button w3-col" style="width: 2em; height: 2em; padding:0; margin:0;flex-shrink:0;flex-grow:0;" @onclick=@(() => roll(character))>
+                    <button class="w3-button w3-col w3-right w3-circle" style="width: 2em; height: 2em; padding:0; margin:0;flex-shrink:0;flex-grow:0;" @onclick=@(() => roll(character))>
                         <img src="D20_icon.png" style="width: 100%; height: 100%;">
                     </button>
                     <div class="w3-rest">
-                        <input class="w3-input" type="number" @bind=@character.Initative>
+                        <input class="w3-input" type="number" @bind=@character.Initiative>
                     </div>
                 </td>
                 <td>
@@ -86,86 +205,105 @@
                     </select>
                 </td>
                 <td>
-                    <select class="w3-input" @bind=@character.Team style="color: @(character.Team);">
-                        @foreach (var team in teams) {
-                            <option style="color: @(team);">@team</option>
+                    <select class="w3-input" @bind=@character.Team style="color: @(character.Team.ColourCode);">
+                        @foreach (var team in Team.Teams) {
+                            <option style="color: @(team.ColourCode);">@team.Name</option>
                         }
                     </select>
                 </td>
                 <td>
                     <input class="w3-input" type="number" @bind=@character.Hp>
                 </td>
+                <td>
+                    <button title="Edit Attributes" class="w3-button w3-circle" style="width: 2em; height: 2em; padding:0; margin:0;" @onclick=@(() => edit(character))>
+                        <img src="icons/edit.svg" style="width: 100%; height: 100%;">
+                    </button>
+                    <button title="Delete Actor" class="w3-button w3-circle" style="width: 2em; height: 2em; padding:0; margin:0;" @onclick=@(() => rm(character))>
+                        <img src="icons/delete.svg" style="width: 100%; height: 100%;">
+                    </button>
+                </td>
             </tr>
         }
     </tbody>
+    <tfoot style="padding: 6px 40px;">
+        <tr>
+            <td></td>
+            <td><b>Round:</b> <span>@this.round</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tfoot>
 </table>
 
-<footer style="padding: 6px 40px;">
-    <b>Round:</b> <span>@this.round</span>
-</footer>
-<div class="w3-row w3-padding">
-    <div class="w3-col s6">
-        <button class="w3-button w3-border w3-border-blue" @onclick=sort>Sort</button>
-        <button class="w3-button w3-border w3-border-red" @onclick=reset>Reset</button>
-        <button class="w3-button w3-border w3-border-green" @onclick=next>Next</button>
+<div class="w3-row w3-margin-top" style="vertical-align: bottom;">
+    <div class="w3-half">
+        <button class="w3-button w3-border-red" @onclick=sort>Sort</button>
+        <button class="w3-button w3-border-red" @onclick=reset>Reset</button>
+        <button class="w3-button w3-border-blue" @onclick=next>Next</button>
     </div>
-    <div class="w3-col s6">&nbsp;</div>
+    <div class="w3-half" style="text-align: right;">
+        <div>
+            <button class="w3-button w3-border-red" @onclick=clear>
+                <img src="icons/delete.svg" style="width: 1em"> All
+            </button>
+            <button class="w3-button w3-border-red" @onclick=@(() => clear(CharacterKind.Player))>
+                <img src="icons/delete.svg" style="width: 1em"> Players
+            </button>
+            <button class="w3-button w3-border-red" @onclick=@(() => clear(CharacterKind.NPC))>
+                <img src="icons/delete.svg" style="width: 1em"> NPCs
+            </button>
+        </div>
+    </div>
 </div>
-
-@if (optionPinCurrentActor) {
-    <div class="w3-padding @optionPinningBackground" style="position: fixed; left: 0; @(optionPinningVertical): 0; width: 100%;">
-        @{
-            var actor = this.ActiveCharacter;
-            var next = this.NextCharacter;
-            if (actor != null) {
-                <div class="w3-round-xlarge panel" style="width: 480px; max-width: 100%; @optionPinningHorizontal padding: 4px;">
-                    <div class="w3-round-xlarge w3-bar w3-padding w3-row accent">
-                        @if (next != null) {
-                        <div class="w3-col w3-right" style="width: 120px; overflow: hidden;">
-                            <div class="w3-bar-item w3-center">
-                                <button class="w3-large w3-button w3-round-large" style="padding:4px" @onclick=this.next>Next:</button><br>
-                                <span class="w3-text-@next.Team">@next.Name</span>
-                            </div>
-                        </div>
-                        }
-                        <div class="w3-rest">
-                            <div class="w3-bar-item">
-                                <span class="w3-large">@actor.Name</span><br>
-                                <div class="w3-display-container w3-small" style="display: inline-block; width: 2.5em">
-                                    <img src="D20_icon.png" class="w3-circle" style="width: 100%">
-                                    <span class="w3-display-middle w3-text-white">@actor.Initative</span>
-                                </div>
-                                <div class="w3-display-container w3-small" style="display: inline-block; width: 2.5em">
-                                    <img src="icons/heart.svg" class="w3-circle" style="width: 100%">
-                                    <span class="w3-display-middle w3-text-white">@actor.Hp</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<details class="w3-padding">
+    <summary style="user-select: none;">JSON</summary>
+    <div class="w3-row">
+        <div class="w3-col" style="width: 12em;">
+            <button class="w3-button w3-border-red w3-margin-top w3-margin-bottom" style="width: 70%" @onclick=serialize>Download</button>
+            <button class="w3-button w3-border-blue w3-margin-bottom" style="width: 70%" @onclick=deserializeRem>Upload & Replace</button>
+            <button class="w3-button w3-border-blue" style="width: 70%" @onclick=deserializeAdd>Upload & Append</button>
+        </div>
+        <div class="w3-rest">
+            <textarea class="w3-input" style="min-height: 12em" @bind=json></textarea>
+            @if (jsonError != null) {
+                <div>
+                    <b>Error:</b> @jsonError
                 </div>
             }
-        }
+        </div>
     </div>
-}
+</details>
+
+</div>
+
+<PinnedActor @ref=pinned ActiveCharacter=@ActiveCharacter NextCharacter=@NextCharacter></PinnedActor>
 
 @code {
     private List<Character> participants = new List<Character>();
-    private string[] teams = new string[]{"blue", "green", "red", "yellow", "magenta"};
 
-    private bool optionPinCurrentActor;
+    private PinnedActor pinned;
+    private bool optionPinCurrentActor {
+        get => pinned?.IsVisible() ?? false;
+        set => pinned?.Show(value);
+    }
 
-    private static readonly string Transparent = "transparent";
-    private static readonly string Solid = "panel";
-    private string optionPinningBackground = Transparent;
+    private PinnedActor.BackgroundClass optionPinningBackground {
+        get => pinned?.GetClass() ?? PinnedActor.BackgroundClass.b_solid;
+        set => pinned?.SetClass(value);
+    }
 
-    private static readonly string Top = "top";
-    private static readonly string Bottom = "bottom";
-    private string optionPinningVertical = Bottom;
+    private PinnedActor.VerticalAnchor optionPinningVertical {
+        get => pinned?.GetVerticalAnchor() ?? PinnedActor.VerticalAnchor.v_bottom;
+        set => pinned?.SetVerticalAnchor(value);
+    }
 
-    private static readonly string Middle = "margin-left: auto; margin-right: auto;";
-    private static readonly string Left = "margin-left: 0; margin-right: auto;";
-    private static readonly string Right = "margin-left: auto; margin-right: 0;";
-    private string optionPinningHorizontal = Middle;
+    private PinnedActor.HorizontalAnchor optionPinningHorizontal {
+        get => pinned?.GetHorizontalAnchor() ?? PinnedActor.HorizontalAnchor.h_middle;
+        set => pinned?.SetHorizontalAnchor(value);
+    }
 
     private bool optionSkipDeadNPC = false;
 
@@ -213,15 +351,16 @@
     }
 
     private void sort() {
-        participants = participants.OrderByDescending(c => c.Initative).ToList();
+        participants = participants.OrderByDescending(c => c.Initiative).ToList();
     }
 
     private Random rng = new Random();
     private void roll(Character c) {
-        c.Initative = rng.Next(20) + 1;
+        c.Initiative = rng.Next(20) + 1;
     }
 
-    private int round = 0;
+    private const int roundStart = 1;
+    private int round = roundStart;
     private void next() {
         if (participants.Count < 1)
             return;
@@ -249,7 +388,7 @@
     }
 
     private void reset() {
-        round = 0;
+        round = roundStart;
         foreach (var c in this.participants)
             c.IsTurn = false;
         if (this.participants.Count > 0)
@@ -264,29 +403,138 @@
     }
 
     private void add(Character c) {
+        // Ensure unique names
+        var uname = c.Name;
+        var uid = 1;
+        while (true) {
+            var wasConflict = false;
+            foreach (var other in this.participants) {
+                if (other.Name == uname) {
+                    uname = c.Name + " (" + (++uid) + ")";
+                    wasConflict = true;
+                    break;
+                }
+            }
+            if (!wasConflict) 
+                break;
+        }
+        c.Name = uname;
+        // Add
         this.participants.Add(c);
+        // Make this the active turn participant
         if (this.participants.Count == 1)
             this.participants[0].IsTurn = true;
     }
-    private void addGeneric() {
-        add(new Character {
-            Kind = CharacterKind.NPC,
-            Team = teams[0],
-            Initative = 1,
-        });
+    private void rm(Character c) {
+        var indexOf = this.participants.IndexOf(c);
+        if (indexOf >= 0) {
+            this.participants.RemoveAt(indexOf);
+            if (c.IsTurn && indexOf >= 0 && indexOf < this.participants.Count) {
+                this.participants[indexOf].IsTurn = true;
+            }
+        }
     }
     private void addPlayer() {
         add(new Character {
             Kind = CharacterKind.Player,
-            Team = teams[1],
-            Initative = 1,
+            Team = Team.Teams[1],
+            Initiative = 1,
         });
     }
     private void addNPC() {
         add(new Character {
             Kind = CharacterKind.NPC,
-            Team = teams[2],
-            Initative = 1,
+            Team = Team.Teams[2],
+            Initiative = 1,
         });
+    }
+    private Modal catalogue;
+    private bool nameSearch(string searchString, Character searchItem) {
+        return searchString != null 
+            && searchItem.Name != null 
+            && searchItem.Name.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+    private void addFromCatalogue() {
+        catalogue?.Show(true);
+    }
+    private void moveUp(Character c) {
+        var currentIndex = participants.IndexOf(c);
+        if (currentIndex > 0) {
+            var prev = participants[currentIndex - 1];
+            participants[currentIndex - 1] = c;
+            participants[currentIndex] = prev;
+        }
+    }
+
+    private void moveDown(Character c) {
+        var currentIndex = participants.IndexOf(c);
+        if (currentIndex >= 0 && currentIndex < (participants.Count - 1)) {
+            var next = participants[currentIndex + 1];
+            participants[currentIndex + 1] = c;
+            participants[currentIndex] = next;
+        }
+    }
+
+    private string json;
+    private string jsonError;
+    private void serialize() {
+        jsonError = null;
+        json = System.Text.Json.JsonSerializer.Serialize(this.participants);
+    }
+    private void assertOnlyOneHasTurn() {
+        var first = true;
+        foreach (var c in this.participants) {
+            if (c.IsTurn && first) {
+                first = false;
+                continue;
+            } 
+            if (c.IsTurn && !first) {
+                c.IsTurn = false;
+                continue;
+            }
+        }
+    }
+    private void deserializeRem() {
+        try {
+            jsonError = null;
+            var chars = System.Text.Json.JsonSerializer.Deserialize<List<Character>>(json);
+            this.participants = chars;
+
+            // Assert only 1 is "isTurn"
+            assertOnlyOneHasTurn();
+        } catch (Exception e) {
+            jsonError = e.Message;
+        }
+    }
+    private void deserializeAdd() {
+        try {
+            jsonError = null;
+            var chars = System.Text.Json.JsonSerializer.Deserialize<List<Character>>(json);
+            this.participants.AddRange(chars);
+
+            // Assert only 1 is "isTurn"
+            assertOnlyOneHasTurn();
+        } catch (Exception e) {
+            jsonError = e.Message;
+        }
+    }
+
+
+    private Character editedCharacter;
+    private Modal editor;
+    public void edit(Character c) {
+        this.editedCharacter = c;
+        this.editor?.Show(true);
+    }
+    private void addAttr(Character c) {
+        if (c.Attributes == null) { 
+            c.Attributes = new List<Data.Attribute>(); 
+        } 
+        c.Attributes.Add(new Data.Attribute());
+    }
+    private void remAttr(Character c) {
+        if (c.Attributes == null || c.Attributes.Count < 1)
+            return;
+        c.Attributes.RemoveAt(c.Attributes.Count - 1);
     }
 }
