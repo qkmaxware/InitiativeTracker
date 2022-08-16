@@ -113,6 +113,21 @@ tr.active {
     background-color: transparent;
 }
 
+.loader {
+    display: inline-block;
+    border: 16px solid rgb(37,37,37); /* Background */
+    border-top: 16px solid rgb(197, 49, 49); /* Forground */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: loader-spin 2s linear infinite;
+}
+
+@keyframes loader-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
