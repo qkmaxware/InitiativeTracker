@@ -65,6 +65,35 @@
                     <input class="w3-input" type="text" @bind=@editedCharacter.Name>
                     <label>Portrait Url</label>
                     <input class="w3-input" type="text" @bind=@editedCharacter.Links.IconUrl>
+                    <label>
+                        Class(es)
+                    </label>
+                    <ul class="w3-ul" style="margin: 0; padding: 0;">
+                        @if (editedCharacter.Classes != null && editedCharacter.Classes.Count > 0) {
+                            <li class="w3-row">
+                                <div class="w3-col w3-right" style="width: 4em; padding-left: 8px; text-align: center;">
+                                    <label>Lvl</label>
+                                </div>
+                                <div class="w3-rest" style="padding-right: 8px;">
+                                    <label>Class</label>
+                                </div>
+                            </li>
+                        }
+                        @foreach (var @cls in editedCharacter.Classes) {
+                            <li class="w3-row">
+                                <div class="w3-col w3-right" style="width: 4em; padding-left: 8px;">
+                                    <input class="w3-input" type="number" placeholder="level" @bind=@cls.Level>
+                                </div>
+                                <div class="w3-rest" style="padding-right: 8px;">
+                                    <input class="w3-input" type="text" placeholder="class" @bind=@cls.Name>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                    <div>
+                        <button class="w3-button w3-small" style="padding: 0; min-width: 2em;" @onclick=@(() => remClass(editedCharacter))>-</button>
+                        <button class="w3-button w3-small" style="padding: 0; min-width: 2em;" @onclick=@(() => addClass(editedCharacter))>+</button>
+                    </div>
                 </div>
                 <div class="w3-row-padding">
                     <div class="w3-half">
@@ -479,7 +508,9 @@
     private string jsonError;
     private void serialize() {
         jsonError = null;
-        json = System.Text.Json.JsonSerializer.Serialize(this.participants);
+        json = System.Text.Json.JsonSerializer.Serialize(this.participants, new System.Text.Json.JsonSerializerOptions {
+            WriteIndented = true,
+        });
     }
     private void assertOnlyOneHasTurn() {
         var first = true;
@@ -536,5 +567,14 @@
         if (c.Attributes == null || c.Attributes.Count < 1)
             return;
         c.Attributes.RemoveAt(c.Attributes.Count - 1);
+    }
+
+    private void remClass(Character c) {
+        if (c.Classes == null || c.Classes.Count < 1)
+            return;
+        c.Classes.RemoveAt(c.Classes.Count - 1);
+    }
+    private void addClass(Character c) {
+        c.Classes.Add(new Class { Level = 1 });
     }
 }

@@ -37,6 +37,7 @@
                         }
                         <div class="w3-rest">
                             <span class="w3-large">@actor.Name</span><br>
+                            <span>@string.Join(", ", actor.Classes)</span><br>
                             <div>
                                 @if (actor.Attributes != null) {
                                     foreach (var att in actor.Attributes) {

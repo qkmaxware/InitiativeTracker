@@ -62,9 +62,29 @@ public class ExternalLinks {
     public string DataSheetUrl {get; set;}
 }
 
+public class Class {
+    public int Level {get; set;}
+    public string Name {get; set;}
+
+    public override string ToString() => $"Lvl.{Level} {Name}";
+}
+
 public class Character {
     public CharacterKind Kind {get; set;}
     public Team Team {get; set;} = Team.Teams[0];
+    private List<Class> _classes;
+    public List<Class> Classes {
+        get {
+            if (_classes == null)
+                _classes = new List<Class>();
+            return _classes;
+        } 
+        set {
+            if (value == null)
+                value = new List<Class>();
+            _classes = value;
+        }
+    }
     private ExternalLinks _links;
     public ExternalLinks Links {
         get {
@@ -97,6 +117,7 @@ public class Character {
         return new Character {
             Kind = this.Kind,
             Team = this.Team,
+            Classes = this.Classes.Select(cls => new Class { Name = cls.Name, Level = cls.Level }).ToList(),
             Links = new ExternalLinks {
                 IconUrl = this.Links.IconUrl,
                 DataSheetUrl = this.Links.DataSheetUrl,
